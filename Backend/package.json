@@ -1,11 +1,16 @@
 {
-  "name": "backend",
+  "name": "s84_some_archived_most_awkward_zoom_moments",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "**Project Overview**:",
+  "main": "server.js",
   "scripts": {
-    "test": "jest"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "dependencies": {
+    "express": "^4.21.2"
+  }
 }
