@@ -34,3 +34,6 @@ Optional: Firebase for sign-in, Docker for easy deployment.
 **Why This Project:**
 
 I chose this project because Zoom is something most people are familiar with, and there have been so many hilarious and awkward moments shared online. This project will be a fun way to practice everything I need to learn—user accounts, handling videos/images, and creating a personalized app. It's a lighthearted project that will help me build key skills while also making people laugh!
+
+render deploying link:
+https://s84-some-archived-most-awkward-zoom.onrender.com/moments
