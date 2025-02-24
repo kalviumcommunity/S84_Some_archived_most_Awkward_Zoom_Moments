@@ -1,0 +1,22 @@
+meta {
+  name: Create Zoom Moment
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:5000
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Dog Barking Chaos",
+    "description": "My dog kept barking every time I spoke!",
+    "category": "Pet Interruptions",
+    "rating": 5,
+    "videoUrl": "https://example.com/dog.mp4"
+  }
+  
+}

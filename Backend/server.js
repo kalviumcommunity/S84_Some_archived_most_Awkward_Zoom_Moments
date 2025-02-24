@@ -1,46 +1,89 @@
-// Import the required modules
+// Import required modules
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const app = express();
-const port = process.env.PORT || 5000;  // Set the port, default is 5000
+const port = process.env.PORT || 5000;
 
-// Middleware to parse JSON request bodies
+// Middleware
 app.use(express.json());
+app.use(cors());
 
+// Connect to MongoDB
 mongoose
   .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.error("MongoDB Connection Error:", err));
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-// Home route displaying the database connection status
+// Define Mongoose Schema and Model
+const momentSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  category: { type: String, required: true },
+  rating: { type: Number, required: true, min: 1, max: 5 },
+  videoUrl: { type: String },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Moment = mongoose.model("Moment", momentSchema);
+
+// Home route displaying database connection status
 app.get("/", (req, res) => {
   const dbStatus = mongoose.connection.readyState === 1 ? "Connected" : "Not Connected";
   res.json({ databaseStatus: dbStatus });
 });
 
-// Route for pinging the server to check if it's working
+// Route to check if the server is working
 app.get("/ping", (req, res) => {
   res.send("Pong");
 });
 
-// Example of a route for your Zoom moments feature
-app.get("/moments", (req, res) => {
-  // For now, we just send a placeholder response
-  res.json({ message: "Here are some funny Zoom moments!" });
+// ✅ Create a new Zoom moment (POST)
+app.post("/api/moments", async (req, res) => {
+  try {
+    const { title, description, category, rating, videoUrl } = req.body;
+    const newMoment = new Moment({ title, description, category, rating, videoUrl });
+    await newMoment.save();
+    res.status(201).json({ message: "Moment created successfully!", moment: newMoment });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to create moment" });
+  }
 });
 
-// Route for submitting a Zoom moment (example)
-app.post("/submit-moment", (req, res) => {
-  const { description, videoUrl } = req.body;  // Example of what you might send in the request body
-  // In a real app, you'd save this to the database
-  res.status(201).json({
-    message: "Zoom moment submitted successfully!",
-    data: { description, videoUrl }
-  });
+// ✅ Get all Zoom moments (GET)
+app.get("/api/moments", async (req, res) => {
+  try {
+    const moments = await Moment.find();
+    res.json(moments);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch moments" });
+  }
 });
 
-// Start the server and listen on the specified port
+// ✅ Update a specific moment (PUT)
+app.put("/api/moments/:id", async (req, res) => {
+  try {
+    const updatedMoment = await Moment.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!updatedMoment) return res.status(404).json({ error: "Moment not found" });
+    res.json({ message: "Moment updated successfully!", moment: updatedMoment });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to update moment" });
+  }
+});
+
+// ✅ Delete a specific moment (DELETE)
+app.delete("/api/moments/:id", async (req, res) => {
+  try {
+    const deletedMoment = await Moment.findByIdAndDelete(req.params.id);
+    if (!deletedMoment) return res.status(404).json({ error: "Moment not found" });
+    res.json({ message: "Moment deleted successfully!" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete moment" });
+  }
+});
+
+// Start the server
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`🚀 Server running at http://localhost:${port}`);
 });
