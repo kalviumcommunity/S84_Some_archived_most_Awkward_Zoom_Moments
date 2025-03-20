@@ -4,8 +4,9 @@ const MomentCard = ({ moment }) => {
         <h2 className="text-xl font-bold mb-2">{moment.title}</h2>
         <p className="text-gray-700">{moment.description}</p>
         {moment.image && <img src={moment.image} alt="Awkward Zoom moment" className="rounded mt-2" />}
+        <p className="text-sm text-gray-400">Category: {moment.category}</p>
         <div className="flex items-center justify-between mt-3">
-          <span className="text-sm text-gray-500">Rating: ⭐ {moment.rating}/5</span>
+          <span className="text-sm text-gray-500">Rating:  {moment.rating}/5</span>
           <button className="text-blue-500 hover:underline">Rate This Moment</button>
         </div>
       </div>

@@ -44,3 +44,12 @@ export default function Home() {
     </div>
   );
 }
+useEffect(() => {
+  fetch('http://localhost:5000/moments')
+    .then(response => response.json())
+    .then(data => setMoments(data))
+    .catch(err => console.error('Failed to load moments:', err));
+}, []);
+{moments.map((moment) => (
+  <MomentCard key={moment._id} moment={moment} />
+))}
