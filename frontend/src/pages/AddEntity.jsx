@@ -25,11 +25,12 @@ const AddEntity = () => {
     };
 
     const response = await fetch("https://s84-some-archived-most-awkward-zoom.onrender.com/moments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newMoment),
-    });
-
+      if (response.ok) {
+        const savedMoment = await response.json();
+        setMoments([...moments, savedMoment.moment]);
+        setTitle("");
+        setDescription("");
+      }
     if (response.ok) {
       setMoments([...moments, newMoment]);
       setTitle("");
