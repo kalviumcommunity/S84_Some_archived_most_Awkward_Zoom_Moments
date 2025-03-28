@@ -17,8 +17,13 @@ const AddEntity = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newMoment = { title, description };
-    
+    const newMoment = { 
+      title, 
+      description, 
+      category: "default", // Add appropriate category or make this a form field
+      rating: 0 // Add appropriate default rating or make this a form field
+    };
+
     const response = await fetch("https://s84-some-archived-most-awkward-zoom.onrender.com/moments", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
