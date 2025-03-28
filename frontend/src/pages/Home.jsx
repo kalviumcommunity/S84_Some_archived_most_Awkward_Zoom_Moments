@@ -1,6 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import MomentCard from '../components/MomentCard'; // Ensure you import this component if it's in a separate file
 
 export default function Home() {
+  const [moments, setMoments] = useState([]);
+
+  // Fetch moments data from backend
+  useEffect(() => {
+    fetch('https://s84-some-archived-most-awkward-zoom.onrender.com/moments')
+      .then((response) => response.json())
+      .then((data) => setMoments(data))
+      .catch((err) => console.error('Failed to load moments:', err));
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6">
       <h1 className="text-4xl font-bold text-blue-600 mb-4">
@@ -8,7 +19,7 @@ export default function Home() {
       </h1>
 
       <p className="text-lg text-gray-700 text-center max-w-2xl">
-        Ever had an awkward moment on Zoom? You're not alone! This platform is a collection of the funniest and most embarrassing Zoom moments. 
+        Ever had an awkward moment on Zoom? You're not alone! This platform is a collection of the funniest and most embarrassing Zoom moments.
         Share your own mishaps, rate others, and explore categories like "Worst Virtual Backgrounds" or "Most Embarrassing Mutes."
       </p>
 
@@ -34,22 +45,25 @@ export default function Home() {
         </p>
       </div>
 
+      {/* Render Moments */}
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {moments.length > 0 ? (
+          moments.map((moment) => (
+            <MomentCard key={moment._id} moment={moment} />
+          ))
+        ) : (
+          <p className="text-gray-700">No awkward moments yet — be the first to share one!</p>
+        )}
+      </div>
+
       <div className="mt-6">
-        <a 
-          href="https://s84-some-archived-most-awkward-zoom.onrender.com/moments" 
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg text-lg font-semibold hover:bg-blue-700 transition">
+        <a
+          href="https://s84-some-archived-most-awkward-zoom.onrender.com/moments"
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg text-lg font-semibold hover:bg-blue-700 transition"
+        >
           Visit Live Project
         </a>
       </div>
     </div>
   );
 }
-useEffect(() => {
-  fetch('http://localhost:5000/moments')
-    .then(response => response.json())
-    .then(data => setMoments(data))
-    .catch(err => console.error('Failed to load moments:', err));
-}, []);
-{moments.map((moment) => (
-  <MomentCard key={moment._id} moment={moment} />
-))}
