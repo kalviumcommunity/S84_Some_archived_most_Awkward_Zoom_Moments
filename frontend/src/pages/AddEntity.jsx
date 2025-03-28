@@ -20,8 +20,8 @@ const AddEntity = () => {
     const newMoment = { 
       title, 
       description, 
-      category: "default", // Add appropriate category or make this a form field
-      rating: 0 // Add appropriate default rating or make this a form field
+      category: category || "default", // Use the category state variable
+      rating: rating || 0 // Use the rating state variable
     };
 
     const response = await fetch("https://s84-some-archived-most-awkward-zoom.onrender.com/moments", {
