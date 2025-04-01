@@ -24,7 +24,12 @@ const UpdateMoment = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(moment),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(() => navigate("/"))
       .catch((error) => console.error("Error updating moment:", error));
   };
