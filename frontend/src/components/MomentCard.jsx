@@ -27,7 +27,11 @@ const MomentCard = ({ moment, onDelete }) => {
         </Link>
         <button
           className="bg-red-500 text-white px-3 py-1 rounded"
-          onClick={() => onDelete(moment._id)}
+          onClick={() => {
+            if (window.confirm("Are you sure you want to delete this moment?")) {
+              onDelete(moment._id);
+            }
+          }}
         >
           Delete
         </button>
