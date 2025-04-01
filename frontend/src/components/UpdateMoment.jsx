@@ -7,7 +7,7 @@ const UpdateMoment = () => {
   const [moment, setMoment] = useState({ title: "", description: "", category: "", rating: "" });
 
   useEffect(() => {
-    fetch(`https://your-backend-url/moments/${id}`)
+    fetch(`${process.env.REACT_APP_API_URL}/moments/${id}`)
       .then((res) => res.json())
       .then((data) => setMoment(data))
       .catch((error) => console.error("Error fetching moment:", error));
