@@ -3,7 +3,7 @@ const router = express.Router();
 const Moment = require("./models/Moment");
 
 // Create a new Zoom moment
-router.post("/", async (req, res) => {
+router.post("/moments", async (req, res) => {
   try {
     const { title, description, category, rating } = req.body;
 
@@ -24,7 +24,7 @@ router.post("/", async (req, res) => {
 });
 
 // Read all moments
-router.get("/", async (req, res) => {
+router.get("/moments", async (req, res) => {
   try {
     const moments = await Moment.find();
     res.status(200).json(moments);
@@ -35,7 +35,7 @@ router.get("/", async (req, res) => {
 });
 
 // Read a single moment by ID
-router.get("/:id", async (req, res) => {
+router.get("/moments/:id", async (req, res) => {
   try {
     const moment = await Moment.findById(req.params.id);
     if (!moment) {
@@ -49,7 +49,7 @@ router.get("/:id", async (req, res) => {
 });
 
 // Update a moment by ID
-router.put("/:id", async (req, res) => {
+router.put("/moments/:id", async (req, res) => {
   try {
     const { title, description, category, rating } = req.body;
 
@@ -76,7 +76,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // Delete a moment by ID
-router.delete("/:id", async (req, res) => {
+router.delete("/moments/:id", async (req, res) => {
   try {
     const deletedMoment = await Moment.findByIdAndDelete(req.params.id);
 
