@@ -1,27 +1,39 @@
 const express = require("express");
+const { body, validationResult } = require("express-validator"); // Importing validation tools
 const router = express.Router();
 const Moment = require("./models/Moment");
 
 // Create a new Zoom moment
-router.post("/moments", async (req, res) => {
-  try {
-    const { title, description, category, rating } = req.body;
-
+router.post(
+  "/moments",
+  [
+    // Validation rules
+    body("title").notEmpty().trim().escape().withMessage("Title is required"),
+    body("description").notEmpty().trim().escape().withMessage("Description is required"),
+    body("category").notEmpty().trim().escape().withMessage("Category is required"),
+    body("rating").isInt({ min: 1, max: 5 }).withMessage("Rating must be between 1 and 5"),
+  ],
+  async (req, res) => {
     // Validate request body
-    if (!title || !description || !category || rating === undefined) {
-      return res.status(400).json({ error: "All fields are required" });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    // Create and save the new moment
-    const newMoment = new Moment({ title, description, category, rating });
-    const savedMoment = await newMoment.save();
+    try {
+      const { title, description, category, rating } = req.body;
 
-    res.status(201).json({ message: "Moment created successfully", moment: savedMoment });
-  } catch (error) {
-    console.error("Error creating moment:", error);
-    res.status(500).json({ error: "Failed to create moment" });
+      // Create and save the new moment
+      const newMoment = new Moment({ title, description, category, rating });
+      const savedMoment = await newMoment.save();
+
+      res.status(201).json({ message: "Moment created successfully", moment: savedMoment });
+    } catch (error) {
+      console.error("Error creating moment:", error);
+      res.status(500).json({ error: "Failed to create moment" });
+    }
   }
-});
+);
 
 // Read all moments
 router.get("/moments", async (req, res) => {
@@ -49,31 +61,42 @@ router.get("/moments/:id", async (req, res) => {
 });
 
 // Update a moment by ID
-router.put("/moments/:id", async (req, res) => {
-  try {
-    const { title, description, category, rating } = req.body;
-
+router.put(
+  "/moments/:id",
+  [
+    // Validation rules for update
+    body("title").notEmpty().withMessage("Title is required"),
+    body("description").notEmpty().withMessage("Description is required"),
+    body("category").notEmpty().withMessage("Category is required"),
+    body("rating").isInt({ min: 1, max: 5 }).withMessage("Rating must be between 1 and 5"),
+  ],
+  async (req, res) => {
     // Validate request body
-    if (!title || !description || !category || rating === undefined) {
-      return res.status(400).json({ error: "All fields are required" });
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
 
-    const updatedMoment = await Moment.findByIdAndUpdate(
-      req.params.id,
-      { title, description, category, rating },
-      { new: true, runValidators: true }
-    );
+    try {
+      const { title, description, category, rating } = req.body;
 
-    if (!updatedMoment) {
-      return res.status(404).json({ error: "Moment not found" });
+      const updatedMoment = await Moment.findByIdAndUpdate(
+        req.params.id,
+        { title, description, category, rating },
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedMoment) {
+        return res.status(404).json({ error: "Moment not found" });
+      }
+
+      res.status(200).json({ message: "Moment updated successfully", moment: updatedMoment });
+    } catch (error) {
+      console.error("Error updating moment:", error);
+      res.status(500).json({ error: "Failed to update moment" });
     }
-
-    res.status(200).json({ message: "Moment updated successfully", moment: updatedMoment });
-  } catch (error) {
-    console.error("Error updating moment:", error);
-    res.status(500).json({ error: "Failed to update moment" });
   }
-});
+);
 
 // Delete a moment by ID
 router.delete("/moments/:id", async (req, res) => {
