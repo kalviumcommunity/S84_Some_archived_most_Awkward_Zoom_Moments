@@ -8,9 +8,9 @@ router.post(
   "/moments",
   [
     // Validation rules
-    body("title").notEmpty().withMessage("Title is required"),
-    body("description").notEmpty().withMessage("Description is required"),
-    body("category").notEmpty().withMessage("Category is required"),
+    body("title").notEmpty().trim().escape().withMessage("Title is required"),
+    body("description").notEmpty().trim().escape().withMessage("Description is required"),
+    body("category").notEmpty().trim().escape().withMessage("Category is required"),
     body("rating").isInt({ min: 1, max: 5 }).withMessage("Rating must be between 1 and 5"),
   ],
   async (req, res) => {
