@@ -12,6 +12,7 @@ router.post(
     body("description").notEmpty().withMessage("Description is required"),
     body("category").notEmpty().withMessage("Category is required"),
     body("rating").isInt({ min: 1, max: 5 }).withMessage("Rating must be between 1 and 5"),
+    body("created_by").notEmpty().withMessage("created_by is required"),
   ],
   async (req, res) => {
     // Validate request body
@@ -59,6 +60,23 @@ router.get("/moments/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch moment" });
   }
 });
+
+router.get("/moments/user/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const moments = await Moment.find({ created_by: userId });
+
+    if (moments.length === 0) {
+      return res.status(404).json({ error: "No moments found for this user" });
+    }
+
+    res.status(200).json(moments);
+  } catch (error) {
+    console.error("Error fetching user moments:", error);
+    res.status(500).json({ error: "Failed to fetch user moments" });
+  }
+});
+
 
 // Update a moment by ID
 router.put(

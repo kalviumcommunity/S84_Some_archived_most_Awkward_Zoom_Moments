@@ -1,10 +1,16 @@
 const mongoose = require("mongoose");
 
 const momentSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  category: { type: String, required: true },
-  rating: { type: Number, required: true, min: 1, max: 5 },
-});
+  title: String,
+  description: String,
+  videoUrl: String,
+  category: String,
+  cringeLevel: Number,
+  created_by: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // Make sure you have a User model
+    required: true,
+  },
+}, { timestamps: true });
 
 module.exports = mongoose.model("Moment", momentSchema);
