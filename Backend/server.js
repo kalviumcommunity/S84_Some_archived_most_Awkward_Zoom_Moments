@@ -2,6 +2,9 @@
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const authRoutes = require('../authRoutes');
 const cors = require("cors");
 
 const app = express();
@@ -9,7 +12,24 @@ const port = process.env.PORT || 5000;
 
 // ✅ Middleware first
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Update with your frontend URL
+  credentials: true
+}));
+app.use(cookieParser());
+app.use(session({
+  secret: 'your_secret_key', // Replace with a real secret
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: process.env.NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Routes
+app.use('/api/auth', authRoutes);
 
 // ✅ Connect to DB
 mongoose.connect(process.env.MONGO_URI,)
