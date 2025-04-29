@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+Moment.belongsTo(User, { foreignKey: 'created_by' });
+User.hasMany(Moment, { foreignKey: 'created_by' });
 
 const momentSchema = new mongoose.Schema({
   title: String,
