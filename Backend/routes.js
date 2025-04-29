@@ -1,134 +1,110 @@
 const express = require("express");
-const { body, validationResult } = require("express-validator"); // Importing validation tools
+const { body, validationResult } = require("express-validator");
 const router = express.Router();
-const Moment = require("./models/Moment");
+const Moment = require("../models/momentModel"); // Sequelize model
+const User = require("../models/userModel");     // Sequelize model
 
-// Create a new Zoom moment
+// ✅ Create a new Moment
 router.post(
   "/moments",
   [
-    // Validation rules
     body("title").notEmpty().withMessage("Title is required"),
     body("description").notEmpty().withMessage("Description is required"),
     body("category").notEmpty().withMessage("Category is required"),
     body("rating").isInt({ min: 1, max: 5 }).withMessage("Rating must be between 1 and 5"),
-    body("created_by").notEmpty().withMessage("created_by is required"),
+    body("created_by").notEmpty().withMessage("created_by (userId) is required"),
   ],
   async (req, res) => {
-    // Validate request body
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+    const { title, description, category, rating, created_by } = req.body;
 
     try {
-      const { title, description, category, rating } = req.body;
-
-      // Create and save the new moment
-      const newMoment = new Moment({ title, description, category, rating });
-      const savedMoment = await newMoment.save();
-
-      res.status(201).json({ message: "Moment created successfully", moment: savedMoment });
+      const moment = await Moment.create({ title, description, category, rating, created_by });
+      res.status(201).json({ message: "Moment created", moment });
     } catch (error) {
-      console.error("Error creating moment:", error);
-      res.status(500).json({ error: "Failed to create moment" });
+      console.error("Create error:", error);
+      res.status(500).json({ error: "Server error while creating moment" });
     }
   }
 );
 
-// Read all moments
+// ✅ Get all Moments
 router.get("/moments", async (req, res) => {
   try {
-    const moments = await Moment.find();
+    const moments = await Moment.findAll({ include: [{ model: User, attributes: ["username"] }] });
     res.status(200).json(moments);
   } catch (error) {
-    console.error("Error fetching moments:", error);
-    res.status(500).json({ error: "Failed to fetch moments" });
+    console.error("Fetch error:", error);
+    res.status(500).json({ error: "Server error while fetching moments" });
   }
 });
 
-// Read a single moment by ID
+// ✅ Get moment by ID
 router.get("/moments/:id", async (req, res) => {
   try {
-    const moment = await Moment.findById(req.params.id);
-    if (!moment) {
-      return res.status(404).json({ error: "Moment not found" });
-    }
+    const moment = await Moment.findByPk(req.params.id);
+    if (!moment) return res.status(404).json({ error: "Moment not found" });
     res.status(200).json(moment);
   } catch (error) {
-    console.error("Error fetching moment:", error);
-    res.status(500).json({ error: "Failed to fetch moment" });
+    console.error("Fetch by ID error:", error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
+// ✅ Get moments by user ID
 router.get("/moments/user/:userId", async (req, res) => {
   try {
-    const userId = req.params.userId;
-    const moments = await Moment.find({ created_by: userId });
-
-    if (moments.length === 0) {
-      return res.status(404).json({ error: "No moments found for this user" });
-    }
-
+    const moments = await Moment.findAll({ where: { created_by: req.params.userId } });
+    if (!moments.length) return res.status(404).json({ error: "No moments found for this user" });
     res.status(200).json(moments);
   } catch (error) {
-    console.error("Error fetching user moments:", error);
-    res.status(500).json({ error: "Failed to fetch user moments" });
+    console.error("User moments error:", error);
+    res.status(500).json({ error: "Server error" });
   }
 });
 
-
-// Update a moment by ID
+// ✅ Update a moment
 router.put(
   "/moments/:id",
   [
-    // Validation rules for update
     body("title").notEmpty().withMessage("Title is required"),
     body("description").notEmpty().withMessage("Description is required"),
     body("category").notEmpty().withMessage("Category is required"),
     body("rating").isInt({ min: 1, max: 5 }).withMessage("Rating must be between 1 and 5"),
   ],
   async (req, res) => {
-    // Validate request body
     const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
     try {
       const { title, description, category, rating } = req.body;
-
-      const updatedMoment = await Moment.findByIdAndUpdate(
-        req.params.id,
+      const updated = await Moment.update(
         { title, description, category, rating },
-        { new: true, runValidators: true }
+        { where: { id: req.params.id } }
       );
 
-      if (!updatedMoment) {
-        return res.status(404).json({ error: "Moment not found" });
-      }
+      if (!updated[0]) return res.status(404).json({ error: "Moment not found" });
 
-      res.status(200).json({ message: "Moment updated successfully", moment: updatedMoment });
+      const updatedMoment = await Moment.findByPk(req.params.id);
+      res.status(200).json({ message: "Moment updated", moment: updatedMoment });
     } catch (error) {
-      console.error("Error updating moment:", error);
-      res.status(500).json({ error: "Failed to update moment" });
+      console.error("Update error:", error);
+      res.status(500).json({ error: "Server error while updating moment" });
     }
   }
 );
 
-// Delete a moment by ID
+// ✅ Delete a moment
 router.delete("/moments/:id", async (req, res) => {
   try {
-    const deletedMoment = await Moment.findByIdAndDelete(req.params.id);
-
-    if (!deletedMoment) {
-      return res.status(404).json({ error: "Moment not found" });
-    }
-
-    res.status(200).json({ message: "Moment deleted successfully" });
+    const deleted = await Moment.destroy({ where: { id: req.params.id } });
+    if (!deleted) return res.status(404).json({ error: "Moment not found" });
+    res.status(200).json({ message: "Moment deleted" });
   } catch (error) {
-    console.error("Error deleting moment:", error);
-    res.status(500).json({ error: "Failed to delete moment" });
+    console.error("Delete error:", error);
+    res.status(500).json({ error: "Server error while deleting moment" });
   }
 });
 
