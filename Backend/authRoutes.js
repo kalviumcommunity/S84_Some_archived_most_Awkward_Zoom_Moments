@@ -43,7 +43,8 @@ router.post('/login', async (req, res) => {
       httpOnly: true,
       sameSite: 'strict',
       secure: process.env.NODE_ENV === 'production', // only over HTTPS in production
-      maxAge: 3600000 // 1 hour
+      maxAge: 3600000, // 1 hour
+      path: '/api' // Restrict cookie to API routes only
     });
 
     res.json({ message: 'Login successful' });
