@@ -8,9 +8,16 @@ const User = require("../models/userModel");     // Sequelize model
 router.post(
   "/moments",
   [
+ feat/sql-user-entity-relation
     body("title").notEmpty().withMessage("Title is required"),
     body("description").notEmpty().withMessage("Description is required"),
     body("category").notEmpty().withMessage("Category is required"),
+
+    // Validation rules
+    body("title").notEmpty().trim().escape().withMessage("Title is required"),
+    body("description").notEmpty().trim().escape().withMessage("Description is required"),
+    body("category").notEmpty().trim().escape().withMessage("Category is required"),
+ main
     body("rating").isInt({ min: 1, max: 5 }).withMessage("Rating must be between 1 and 5"),
     body("created_by").notEmpty().withMessage("created_by (userId) is required"),
   ],

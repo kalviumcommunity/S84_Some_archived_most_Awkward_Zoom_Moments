@@ -7,7 +7,7 @@ const UpdateMoment = () => {
   const [moment, setMoment] = useState({ title: "", description: "", category: "", rating: "" });
 
   useEffect(() => {
-    fetch(`https://your-backend-url/moments/${id}`)
+    fetch(`${process.env.REACT_APP_API_URL}/moments/${id}`)
       .then((res) => res.json())
       .then((data) => setMoment(data))
       .catch((error) => console.error("Error fetching moment:", error));
@@ -24,7 +24,12 @@ const UpdateMoment = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(moment),
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(() => navigate("/"))
       .catch((error) => console.error("Error updating moment:", error));
   };

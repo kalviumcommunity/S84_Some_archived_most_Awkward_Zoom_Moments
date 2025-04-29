@@ -6,7 +6,7 @@ export default function Home() {
 
   // Fetch moments data from backend
   useEffect(() => {
-    fetch('http://localhost:5000/moments')
+    fetch('https://s84-some-archived-most-awkward-zoom.onrender.com/moments')
       .then((response) => response.json())
       .then((data) => setMoments(data))
       .catch((err) => console.error('Failed to load moments:', err));

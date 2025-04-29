@@ -17,14 +17,20 @@ const AddEntity = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newMoment = { title, description };
-    
-    const response = await fetch("https://s84-some-archived-most-awkward-zoom.onrender.com/moments", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newMoment),
-    });
+    const newMoment = { 
+      title, 
+      description, 
+      category: category || "default", // Use the category state variable
+      rating: rating || 0 // Use the rating state variable
+    };
 
+    const response = await fetch("https://s84-some-archived-most-awkward-zoom.onrender.com/moments", {
+      if (response.ok) {
+        const savedMoment = await response.json();
+        setMoments([...moments, savedMoment.moment]);
+        setTitle("");
+        setDescription("");
+      }
     if (response.ok) {
       setMoments([...moments, newMoment]);
       setTitle("");
